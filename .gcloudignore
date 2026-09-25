@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+.git/
+verify_*.py
+test_*.py
+*.png
+*.log

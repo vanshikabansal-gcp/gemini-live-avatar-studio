@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gemini 3.8 Live — Custom Avatar &amp; Voice Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Minimalist Top Studio Header -->
+  <header class="studio-header">
+    <div class="header-left">
+      <div class="brand-badge">G3.8</div>
+      <div class="brand-text-wrap">
+        <span class="brand-title">Gemini 3.8 Live Studio</span>
+        <span class="brand-meta">cloud-llm-preview1</span>
+      </div>
+    </div>
+
+    <!-- Center: Clean Workspace View Switcher (Eliminates 3-column clutter) -->
+    <nav class="workspace-nav" aria-label="Workspace Views">
+      <button class="nav-tab active" data-view="view-live">
+        Live Conversation
+      </button>
+      <button class="nav-tab" data-view="view-knowledge">
+        Knowledge Base &amp; Agent
+        <span id="nav-kb-count" class="nav-pill-count">2</span>
+      </button>
+      <button class="nav-tab" data-view="view-persona">
+        System Instructions
+      </button>
+    </nav>
+
+    <div class="header-right">
+      <select id="model-selector" class="model-select" aria-label="Select Gemini Live Model" autocomplete="off">
+        <option value="gemini-3.8-live-preview" selected>gemini-3.8-live-preview</option>
+        <option value="gemini-3.8-live">gemini-3.8-live</option>
+        <option value="gemini-3.8-live-extended-thinking-preview">gemini-3.8-live-thinking</option>
+      </select>
+      <button id="btn-edit-avatar-header" class="btn btn-outline" title="Edit Active Saved Avatar (Change Voice, Re-upload Photo, or Update Name)">
+        &#x270E; Edit Saved Avatar
+      </button>
+      <button id="btn-open-builder" class="btn btn-primary">
+        + Create Custom Avatar
+      </button>
+    </div>
+  </header>
+
+  <!-- Saved Avatars Horizontal Ribbon (Clean 1-Click Switching & Editing) -->
+  <section class="avatar-ribbon-bar" aria-label="Saved Avatars Library">
+    <div class="ribbon-inner">
+      <span class="ribbon-label">Saved Avatars:</span>
+      <div id="avatar-list" class="avatar-pills-row"></div>
+      <button id="btn-edit-avatar-ribbon" class="btn-ghost-pill" title="Edit Selected Avatar's Voice or Photo">&#x270E; Edit Active Avatar</button>
+      <button id="btn-new-avatar-side" class="btn-ghost-pill">+ New Photo / Voice Avatar</button>
+    </div>
+  </section>
+
+  <!-- Spacious 2-Column Main Stage -->
+  <main class="main-stage">
+    <!-- Left Column: Hero 9:16 Portrait Avatar Video Frame & Session Controls -->
+    <section class="portrait-stage-col">
+      <div id="avatar-stage-card" class="portrait-card">
+        <div id="portrait-video-container" class="portrait-video-container">
+          <img id="stage-poster-img" src="/static/presets/aria.jpg" alt="Avatar Portrait" class="stage-poster-img" />
+          <video id="live-avatar-video" class="live-avatar-video" autoplay playsinline></video>
+
+          <!-- Floating Top Status Pill (Left) -->
+          <div class="portrait-top-overlay">
+            <span id="session-status-dot" class="status-dot status-idle"></span>
+            <span id="session-status-text" class="status-text">Ready</span>
+            <span id="video-live-pill" class="live-tag hidden">9:16 LIVE</span>
+          </div>
+
+          <!-- Floating Top-Right Full Screen, Transcript Toggle & Quick Avatar Edit Controls -->
+          <div class="portrait-top-right-actions">
+            <label for="stage-direct-photo-input" id="btn-stage-upload-overlay" class="overlay-icon-btn" title="Upload Your Own Photo Directly">
+              &#x1F4F7; Upload Photo
+            </label>
+            <input id="stage-direct-photo-input" type="file" accept="image/*" class="hidden-file-input" />
+            <button id="btn-edit-active-avatar" class="overlay-icon-btn" title="Edit Saved Avatar (Change Voice or Re-upload Photo)">
+              &#x270E; Edit Voice / Photo
+            </button>
+            <button id="btn-toggle-fs-transcript" class="overlay-icon-btn hidden" title="Enable or Disable Live Transcript in Full Screen">
+              &#x1F4AC; Transcript: ON
+            </button>
+            <button id="btn-toggle-fit" class="overlay-icon-btn hidden" title="Toggle 9:16 Fit vs Full Screen Fill">
+              Fill Screen
+            </button>
+            <button id="btn-fullscreen-overlay" class="overlay-icon-btn" title="Toggle Full Screen Avatar Call Mode">
+              &#x26F6; Full Screen
+            </button>
+          </div>
+
+          <!-- Floating Live Captions & Knowledge Agent Overlay (Visible in Full Screen Mode when Transcript is Enabled) -->
+          <div id="fullscreen-caption-overlay" class="fullscreen-caption-overlay hidden">
+            <div id="fullscreen-rag-pill" class="fullscreen-rag-pill hidden"></div>
+            <div id="fullscreen-caption-text" class="fullscreen-caption-text">
+              Live captions will appear here while talking to your avatar...
+            </div>
+          </div>
+
+          <!-- Floating Bottom Identity Overlay -->
+          <div class="portrait-bottom-overlay">
+            <h2 id="stage-avatar-name" class="portrait-name">Aria Chen</h2>
+            <div class="portrait-meta-row">
+              <span id="stage-badge-photo" class="meta-chip">Custom Photo</span>
+              <span id="stage-badge-voice" class="meta-chip">Voice: Aoede</span>
+              <span id="stage-badge-kb" class="meta-chip">2 Sources</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clean Action Dock Under Video (Transforms into Floating Call Bar in Full Screen) -->
+        <div class="portrait-action-dock">
+          <button id="btn-connect-live" class="btn btn-live-connect">
+            Start Live Video Session
+          </button>
+          <button id="btn-disconnect-live" class="btn btn-danger hidden">
+            End Session
+          </button>
+          <button id="btn-toggle-mic" class="btn btn-mic" title="Toggle 16kHz Microphone">
+            <span id="mic-label">Mic Off</span>
+          </button>
+
+          <!-- Quick Chat Input visible inside Full-Screen Call Mode -->
+          <div id="fullscreen-quick-chat" class="fullscreen-quick-chat hidden">
+            <input
+              id="fullscreen-chat-input"
+              type="text"
+              class="fullscreen-chat-input"
+              placeholder="Ask your avatar anything while in full screen..."
+            />
+            <button id="btn-fullscreen-send" class="btn btn-primary btn-sm">Send</button>
+          </div>
+
+          <button id="btn-toggle-fs-transcript-dock" class="btn btn-outline hidden" title="Enable or Disable Live Transcript in Full Screen">
+            &#x1F4AC; Transcript: ON
+          </button>
+          <button id="btn-fullscreen-dock" class="btn btn-outline" title="Make Avatar Full Screen">
+            &#x26F6; Full Screen
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Focused Tabbed Workspace (Only 1 View Shown at a Time) -->
+    <section class="workspace-content-col">
+
+      <!-- ================================================================= -->
+      <!-- VIEW 1: LIVE CONVERSATION & REAL-TIME KNOWLEDGE CITATIONS         -->
+      <!-- ================================================================= -->
+      <div id="view-live" class="workspace-view active">
+        <div class="view-card conversation-card">
+          <div class="view-card-header">
+            <div>
+              <h3 class="view-title">Live Multimodal Conversation</h3>
+              <p class="view-subtitle">Speak with your microphone or type below &mdash; answers are automatically grounded in your avatar's attached knowledge base.</p>
+            </div>
+            <button id="btn-jump-knowledge" class="btn btn-sm btn-outline">
+              + Attach Links / Files
+            </button>
+          </div>
+
+          <!-- Live Transcript Stream -->
+          <div id="transcript-log" class="transcript-log">
+            <div class="empty-chat-state">
+              <div class="empty-chat-title">Start talking with your custom avatar</div>
+              <p class="empty-chat-sub">Click <strong>Start Live Video Session</strong> on the left or send a message below to stream real-time 9:16 video and voice from <code>gemini-3.8-live</code>.</p>
+            </div>
+          </div>
+
+          <!-- Latest Backend Knowledge Agent Citation Banner (Appears dynamically when RAG fires) -->
+          <div id="live-rag-banner" class="live-rag-banner hidden">
+            <div class="rag-banner-title">Backend Knowledge Agent Retrieved Context</div>
+            <div id="live-rag-text" class="rag-banner-body"></div>
+          </div>
+
+          <!-- Prompt Input Bar -->
+          <div class="chat-composer">
+            <input
+              id="chat-text-input"
+              type="text"
+              class="composer-input"
+              placeholder="Ask a question (e.g., 'What is in your attached knowledge base?')..."
+            />
+            <button id="btn-send-text" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 2: KNOWLEDGE BASE (DROP LINKS, ATTACH FILES) & BACKEND AGENT -->
+      <!-- ================================================================= -->
+      <div id="view-knowledge" class="workspace-view">
+        <div class="view-card">
+          <div class="view-card-header">
+            <div>
+              <h3 class="view-title">Avatar Knowledge Base &amp; Backend RAG Agent</h3>
+              <p class="view-subtitle">Attach web links, PDFs, or text notes to this avatar. When questions are asked on the Live API, the Backend Knowledge Agent (`search_avatar_knowledge`) grounds the response.</p>
+            </div>
+          </div>
+
+          <div class="kb-two-col">
+            <!-- Left: Attach New Knowledge -->
+            <div class="kb-add-column">
+              <div class="kb-tabs">
+                <button class="kb-tab active" data-tab="tab-url">Drop Link (URL)</button>
+                <button class="kb-tab" data-tab="tab-file">Upload File</button>
+                <button class="kb-tab" data-tab="tab-note">Paste Text</button>
+              </div>
+
+              <div id="tab-url" class="kb-tab-body active">
+                <label class="field-label">Web Page URL</label>
+                <input id="kb-url-input" type="url" class="text-input" placeholder="https://cloud.google.com/vertex-ai/..." />
+                <label class="field-label mt-10">Optional Title</label>
+                <input id="kb-url-title" type="text" class="text-input" placeholder="e.g., Product Documentation" />
+                <button id="btn-add-url" class="btn btn-primary btn-block mt-12">Index Web Link</button>
+              </div>
+
+              <div id="tab-file" class="kb-tab-body">
+                <label for="kb-file-input" class="file-dropzone">
+                  <span class="dropzone-title">Click or Drop File to Attach</span>
+                  <span class="dropzone-sub">Supports .pdf, .txt, .md, .csv, .json, .html (up to 10MB)</span>
+                  <input id="kb-file-input" type="file" accept=".pdf,.txt,.md,.csv,.json,.html" class="hidden-file-input" />
+                </label>
+                <div id="kb-file-selected" class="selected-file-pill">No file selected</div>
+                <button id="btn-add-file" class="btn btn-primary btn-block mt-12">Upload &amp; Index File</button>
+              </div>
+
+              <div id="tab-note" class="kb-tab-body">
+                <label class="field-label">Knowledge Title</label>
+                <input id="kb-note-title" type="text" class="text-input" placeholder="e.g., Pricing &amp; SLA Facts" />
+                <label class="field-label mt-10">Knowledge Content</label>
+                <textarea id="kb-note-content" class="textarea-input" rows="4" placeholder="Paste facts, FAQs, or talking points..."></textarea>
+                <button id="btn-add-note" class="btn btn-primary btn-block mt-12">Save Knowledge Note</button>
+              </div>
+
+              <!-- Direct Backend Agent Tester -->
+              <div class="agent-test-box">
+                <label class="field-label">Test Backend Knowledge Agent Directly</label>
+                <div class="agent-test-row">
+                  <input id="agent-test-query" type="text" class="text-input" placeholder="Ask a question against attached sources..." />
+                  <button id="btn-test-agent" class="btn btn-outline">Test Agent</button>
+                </div>
+                <div id="agent-events-feed" class="agent-events-feed"></div>
+              </div>
+            </div>
+
+            <!-- Right: Attached Knowledge Items List -->
+            <div class="kb-list-column">
+              <div class="kb-list-header">
+                <span>Attached Knowledge Sources (<span id="kb-count-label">0</span>)</span>
+              </div>
+              <div id="knowledge-list" class="knowledge-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 3: SYSTEM INSTRUCTIONS & PERSONA CONFIGURATION               -->
+      <!-- ================================================================= -->
+      <div id="view-persona" class="workspace-view">
+        <div class="view-card">
+          <div class="view-card-header">
+            <div>
+              <h3 class="view-title">Avatar System Instructions &amp; Persona</h3>
+              <p class="view-subtitle">Customize how this avatar speaks, behaves, and uses its attached knowledge during live video calls.</p>
+            </div>
+            <button id="btn-save-instructions" class="btn btn-primary">Save System Instructions</button>
+          </div>
+
+          <div class="persona-settings-body">
+            <label class="field-label">System Instruction (`systemInstruction` passed to `gemini-3.8-live`)</label>
+            <textarea
+              id="active-system-instruction"
+              class="textarea-input instruction-editor"
+              rows="8"
+              placeholder="Define your avatar's persona, speaking tone, domain expertise, and rules..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ====================================================================== -->
+  <!-- CLEAN 3-STEP WIZARD MODAL: CREATE CUSTOM PHOTO & VOICE AVATAR          -->
+  <!-- ====================================================================== -->
+  <div id="builder-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="builder-modal-title" class="modal-title">Create Custom Photo &amp; Voice Avatar</h2>
+          <p id="builder-modal-subtitle" class="modal-subtitle">Saved avatars can be reused anytime with custom knowledge and instructions</p>
+        </div>
+        <button id="btn-close-builder" class="btn btn-sm btn-outline">Close</button>
+      </div>
+
+      <!-- Clean 3-Step Wizard Stepper Bar -->
+      <div class="wizard-stepper">
+        <button class="wizard-step-btn active" data-step="1">
+          <span class="step-num">1</span> Upload or Choose Photo
+        </button>
+        <button class="wizard-step-btn" data-step="2">
+          <span class="step-num">2</span> Record or Choose Voice
+        </button>
+        <button class="wizard-step-btn" data-step="3">
+          <span class="step-num">3</span> Name &amp; Save Avatar
+        </button>
+      </div>
+
+      <!-- STEP 1: PHOTO AVATAR (UPLOAD YOUR PHOTO / WEBCAM / PRESETS) -->
+      <div id="wizard-step-1" class="wizard-pane active">
+        <div class="step-split-grid">
+          <div class="step-left-controls">
+            <div class="photo-source-tabs">
+              <button id="tab-btn-upload-photo" class="sub-tab active">Upload Your Photo</button>
+              <button id="tab-btn-webcam-photo" class="sub-tab">Webcam Snapshot</button>
+              <button id="tab-btn-preset-photo" class="sub-tab">Preselected Portraits</button>
+            </div>
+
+            <!-- Upload Photo Box -->
+            <div id="photo-pane-upload" class="photo-pane active">
+              <label for="builder-photo-input" class="upload-photo-box">
+                <div class="upload-icon-badge">UPLOAD CUSTOM PHOTO</div>
+                <div class="upload-main-text">Click to Upload Your Own Photo (or Drag &amp; Drop)</div>
+                <div class="upload-sub-text">Supports JPG, PNG, WebP, HEIC (up to 50MB) &mdash; Automatically cropped to 9:16 portrait (704&times;1280)</div>
+                <input id="builder-photo-input" type="file" accept="image/*" class="hidden-file-input" />
+              </label>
+            </div>
+
+            <!-- Webcam Capture -->
+            <div id="photo-pane-webcam" class="photo-pane">
+              <div class="webcam-wrap">
+                <video id="builder-webcam-video" autoplay playsinline muted class="webcam-video"></video>
+                <div class="webcam-actions">
+                  <button id="btn-start-webcam" class="btn btn-sm btn-outline">Start Camera</button>
+                  <button id="btn-capture-webcam" class="btn btn-sm btn-primary">Capture 9:16 Photo</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preselected Portraits -->
+            <div id="photo-pane-preset" class="photo-pane">
+              <div id="builder-preset-grid" class="preset-avatar-grid"></div>
+            </div>
+          </div>
+
+          <!-- Live 9:16 Portrait Preview -->
+          <div class="step-right-preview">
+            <div class="canvas-preview-card">
+              <div style="position: relative; width: 164px; aspect-ratio: 9 / 16; border-radius: 10px; overflow: hidden; background: #0f172a; border: 1px solid var(--border-color);">
+                <canvas id="builder-photo-canvas" width="704" height="1280" class="portrait-preview-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                <img id="builder-photo-preview-img" alt="Uploaded Portrait Preview" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none;" />
+              </div>
+              <div class="canvas-preview-meta">
+                <span class="meta-chip">9:16 Portrait (704 &times; 1280)</span>
+                <p id="builder-photo-status" class="subtle-hint mt-6">Ready for Gemini 3.8 Live</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-footer">
+          <button id="btn-apply-photo-step1" class="btn btn-outline">&#x2713; Save &amp; Use This Photo Now</button>
+          <button class="btn btn-primary wizard-next-btn" data-next="2">Next: Set Up Voice &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: VOICE PROFILE (RECORD YOUR OWN VOICE OR CHOOSE PREBUILT) -->
+      <div id="wizard-step-2" class="wizard-pane">
+        <div class="photo-source-tabs">
+          <button id="tab-btn-record-voice" class="sub-tab active">Record Your Own Voice (Voice Cloning)</button>
+          <button id="tab-btn-prebuilt-voice" class="sub-tab">Choose Preselected Gemini Voice</button>
+        </div>
+
+        <!-- Record Custom Voice -->
+        <div id="voice-pane-record" class="photo-pane active">
+          <div class="reading-prompt-card">
+            <div class="reading-prompt-label">Read this aloud (~15 seconds) while recording your personal voice profile:</div>
+            <blockquote id="voice-script-quote" class="reading-script-text">
+              "When the sunlight strikes raindrops in the air, they act like a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch."
+            </blockquote>
+            <div class="reading-prompt-label">&#x1F399;&#xFE0F; Tips: speak naturally (like talking to a friend), keep it 10&ndash;20 seconds, and turn off fans / AC and close windows &mdash; the cloned voice copies any background noise in your recording.</div>
+          </div>
+
+          <div class="recorder-bar">
+            <button id="btn-record-start" class="btn btn-danger">Start Voice Recording</button>
+            <button id="btn-record-stop" class="btn btn-outline" disabled>Stop Recording</button>
+            <span id="record-timer" class="record-timer">00:00</span>
+            <canvas id="voice-waveform-canvas" width="320" height="44" class="waveform-canvas"></canvas>
+          </div>
+
+          <div class="voice-preview-row">
+            <audio id="recorded-voice-audio" controls class="audio-player"></audio>
+            <label for="builder-voice-upload" class="btn btn-sm btn-outline">
+              Or Upload Audio File (.wav / .mp3)
+              <input id="builder-voice-upload" type="file" accept="audio/*" class="hidden-file-input" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Prebuilt Gemini Voices -->
+        <div id="voice-pane-prebuilt" class="photo-pane">
+          <div id="builder-voice-list" class="voice-grid"></div>
+        </div>
+
+        <div class="wizard-footer">
+          <button class="btn btn-outline wizard-next-btn" data-next="1">&larr; Back to Photo</button>
+          <button id="btn-apply-voice-step2" class="btn btn-outline">&#x2713; Save Voice Change Now</button>
+          <button class="btn btn-primary wizard-next-btn" data-next="3">Next: Name &amp; Save &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: NAME, SYSTEM INSTRUCTIONS & SAVE -->
+      <div id="wizard-step-3" class="wizard-pane">
+        <div class="form-row-2">
+          <div>
+            <label class="field-label">Avatar Name</label>
+            <input id="builder-name" type="text" class="text-input" placeholder="e.g., Vanshika Digital Twin" />
+          </div>
+          <div>
+            <label class="field-label">Role / Tagline</label>
+            <input id="builder-tagline" type="text" class="text-input" placeholder="e.g., AI Product Specialist" />
+          </div>
+        </div>
+
+        <div class="mt-14">
+          <label class="field-label">System Instructions (Optional)</label>
+          <textarea
+            id="builder-instructions"
+            class="textarea-input"
+            rows="4"
+            placeholder="You are a warm, knowledgeable AI specialist. Answer questions using your attached knowledge base..."
+          ></textarea>
+        </div>
+
+        <div class="wizard-footer">
+          <button class="btn btn-outline wizard-next-btn" data-next="2">&larr; Back to Voice</button>
+          <button id="btn-save-new-avatar" class="btn btn-primary btn-lg">
+            Save Reusable Avatar to Studio Library
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/app.js?v=20260925-preview1"></script>
+</body>
+</html>

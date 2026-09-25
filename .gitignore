@@ -1,0 +1,23 @@
+# Virtual environment & Python cache
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local SQLite database (contains user photos, voice samples, and knowledge items)
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets, tokens & local helper scripts
+.env
+.env.*
+*token*
+cloud_run_browser_gateway.py
+cloud_run_token_sync_daemon.py
+
+# Logs & temporary files
+*.log
+*.tmp
+.DS_Store
