@@ -1023,7 +1023,7 @@ def _resolve_session_secret() -> bytes:
     if STUDIO_ACCESS_PASSWORD:
         return hashlib.scrypt(
             STUDIO_ACCESS_PASSWORD.encode("utf-8"),
-            salt=b"gemini-live-avatar-studio-session-v1",
+            salt=b"gemini-live-avatar-studio-session-v2-20261001",
             n=16384,
             r=8,
             p=1,
@@ -1051,7 +1051,7 @@ _REVOKED_TOKENS: set = set()
 _LOGIN_ATTEMPTS: Dict[str, List[float]] = {}
 SESSION_COOKIE_SECURE_NAME = "__Secure-studio_session"
 SESSION_COOKIE_LOCAL_NAME = "studio_session"
-SESSION_TTL_SECONDS = 12 * 3600
+SESSION_TTL_SECONDS = 2 * 3600
 
 
 def verify_studio_password(candidate: str) -> bool:

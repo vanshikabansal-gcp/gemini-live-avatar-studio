@@ -2559,8 +2559,23 @@
       })
       .catch(() => {});
 
+    const btnLogoutStudio = document.getElementById("btn-logout-studio");
+    if (btnLogoutStudio) {
+      btnLogoutStudio.addEventListener("click", async () => {
+        try {
+          stopLiveSession();
+          await fetch("/api/auth/logout", { method: "POST" });
+        } catch (e) {}
+        window.location.href = "/login";
+      });
+    }
+
     try {
       const [cfgResp, avResp] = await Promise.all([fetch("/api/config"), fetch("/api/avatars")]);
+      if (cfgResp.status === 401 || avResp.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       state.config = await cfgResp.json();
       const brandMeta = document.querySelector(".brand-meta");
       if (brandMeta) {
