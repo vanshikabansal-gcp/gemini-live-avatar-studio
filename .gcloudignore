@@ -1,0 +1,14 @@
+.git/
+.gitignore
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+data/
+*.db
+.env
+.env.*
+*token*
+*.log
+*.tmp
+.DS_Store

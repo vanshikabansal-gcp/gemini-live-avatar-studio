@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Internal Access — Gemini 3.8 Live Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --brand-blue: #1a73e8;
+      --brand-blue-hover: #1557b0;
+      --brand-blue-soft: #e8f0fe;
+      --danger-red: #dc2626;
+      --danger-soft: #fee2e2;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #e8f0fe 0%, #f8fafc 55%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 430px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
+      padding: 34px 32px 28px;
+    }
+    .auth-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      background: var(--brand-blue);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-primary);
+    }
+    .brand-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+    }
+    .google-proxy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--brand-blue-soft);
+      color: var(--brand-blue);
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .auth-desc {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+    }
+    .field-group {
+      margin-bottom: 16px;
+    }
+    .field-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .text-input {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .text-input:focus {
+      border-color: var(--brand-blue);
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.14);
+    }
+    .error-banner {
+      display: none;
+      background: var(--danger-soft);
+      color: var(--danger-red);
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 12px 18px;
+      background: var(--brand-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-submit:hover {
+      background: var(--brand-blue-hover);
+    }
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+    .auth-footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="auth-card">
+    <div class="auth-header">
+      <div class="brand-badge">G3.8</div>
+      <div>
+        <div class="brand-title">Gemini 3.8 Live Studio</div>
+        <div class="brand-meta">Created by @vanshikabansal</div>
+      </div>
+    </div>
+
+    <div class="google-proxy-pill">
+      &#x1F512; Google Internal Demo Proxy &middot; @google.com Only
+    </div>
+
+    <p class="auth-desc">
+      This Gemini 3.8 Live Custom Avatar &amp; Voice Studio instance is restricted to <strong>Google (@google.com)</strong> team members. Enter your corporate email and access password to continue.
+    </p>
+
+    <div id="auth-error" class="error-banner" role="alert"></div>
+
+    <form id="login-form" autocomplete="on">
+      <div class="field-group">
+        <label class="field-label" for="login-email">Google Corporate Email</label>
+        <input
+          id="login-email"
+          name="email"
+          type="email"
+          class="text-input"
+          placeholder="username@google.com"
+          required
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="login-password">Studio Access Password</label>
+        <input
+          id="login-password"
+          name="password"
+          type="password"
+          class="text-input"
+          placeholder="Enter studio password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button id="btn-login" type="submit" class="btn-submit">
+        Unlock Gemini 3.8 Live Studio &rarr;
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Protected by Google Internal Access Gate &middot; Contact <strong>@vanshikabansal</strong> for access
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const form = document.getElementById("login-form");
+      const emailIn = document.getElementById("login-email");
+      const passIn = document.getElementById("login-password");
+      const errBox = document.getElementById("auth-error");
+      const btn = document.getElementById("btn-login");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errBox.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Verifying Access...";
+        try {
+          const resp = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: emailIn.value.trim(),
+              password: passIn.value,
+            }),
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (!resp.ok) {
+            errBox.textContent = data.detail || "Invalid @google.com email or password.";
+            errBox.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "Unlock Gemini 3.8 Live Studio \u2192";
+            return;
+          }
+          window.location.href = "/";
+        } catch (err) {
+          errBox.textContent = "Network error while verifying access. Please try again.";
+          errBox.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Unlock Gemini 3.8 Live Studio \u2192";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

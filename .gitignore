@@ -1,0 +1,22 @@
+# Virtual environment & Python cache
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local SQLite database (contains user photos, voice samples, and knowledge items)
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets & environment files
+.env
+.env.*
+!.env.example
+*token*
+
+# Logs & temporary files
+*.log
+*.tmp
+.DS_Store
