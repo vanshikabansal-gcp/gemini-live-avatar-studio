@@ -245,6 +245,63 @@ body {
   display: none;
 }
 
+.prebuilt-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  letter-spacing: 0.02em;
+}
+
+.ribbon-notice-bar {
+  max-width: 1320px;
+  margin: 8px auto 0 auto;
+  padding: 6px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notice-lock-badge {
+  color: #334155;
+}
+
+.notice-create-cta {
+  color: #0f172a;
+}
+
+.inline-cta-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--brand-blue);
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.modal-notice-banner {
+  margin: 0 24px 10px 24px;
+  padding: 9px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #1e3a8a;
+  line-height: 1.45;
+}
+
 .btn-ghost-pill {
   background: transparent;
   border: 1px dashed var(--border-strong);

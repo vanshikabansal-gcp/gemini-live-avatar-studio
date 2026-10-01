@@ -8,12 +8,12 @@ A full-stack, real-time **Custom Photo Avatar & Zero-Shot Voice Cloning Studio**
 
 ## Key Features
 
-- **Custom Photo Avatars (`customizedAvatar`) & Prebuilt Avatars**:
-  - Upload your own portrait photo (or take a webcam snapshot) — automatically normalized to `704x1280` (9:16 portrait) RGB JPEG via FFmpeg.
-  - Or choose from ready-to-use Prebuilt Studio Avatars (`Aria`, `Marcus`, `Elena`, `Kira`, `Kai`, `Vera`).
-- **Zero-Shot Voice Cloning (`replicatedVoiceConfig`) & Prebuilt HD Voices**:
-  - Record a 10–15 second voice sample directly in the browser or upload a `.wav`/`.mp3`/`.m4a` file for real-time voice cloning (`24kHz` 16-bit mono PCM WAV).
-  - Or select any Prebuilt HD Voice (`Aoede`, `Puck`, `Kore`, `Charon`, `Fenrir`, `Zephyr`, `Orbit`, `Achernar`).
+- **Protected Default Prebuilt Avatars (`Aria Chen` & `Dr. Marcus Vance`)**:
+  - Ships with two ready-to-use Prebuilt Avatars (`Aria Chen` and `Dr. Marcus Vance`).
+  - Personal photo/voice uploads and deletion are locked on these two default prebuilt avatars so shared deployments stay clean — users can switch them between any of the **11 official Gemini 3.8 Live Built-in Avatars** (`Kira`, `Ingrid`, `Vera`, `Jay`, `Paul`, `Sam`, `Piper`, `Carmen`, `Leo`, `Kai`, `Ben`) and **Prebuilt HD Voices** (`Aoede`, `Puck`, `Kore`, `Charon`, `Fenrir`, `Zephyr`, `Leda`, `Orus`, `Orbit`, `Achernar`).
+- **Create & Delete Your Own Custom Photo & Voice Avatars (`customizedAvatar` & `replicatedVoiceConfig`)**:
+  - Click **`+ Create Custom Avatar`** to upload your own portrait photo (automatically normalized to `704x1280` 9:16 RGB JPEG via FFmpeg) and record/upload a 10–15 second voice sample (`24kHz` 16-bit mono PCM WAV) for zero-shot voice cloning.
+  - Includes 1-click **`🗑️ Delete Avatar (After Use)`** so users can remove their custom photo & voice immediately after testing.
 - **Per-Avatar System Instructions & Knowledge Base Grounding**:
   - Configure custom **System Instructions** (persona, tone, or stage script) per avatar directly from the UI.
   - Attach custom **Knowledge Base** sources (Website URLs, PDF/TXT/MD/CSV files, or text notes) per avatar for zero-latency grounded Q&A.

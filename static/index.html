@@ -54,12 +54,16 @@
   <!-- Saved Avatars Horizontal Ribbon (Single Clean Location for Switching, Saving, Downloading Voice & Deleting) -->
   <section class="avatar-ribbon-bar" aria-label="Saved Avatars Library">
     <div class="ribbon-inner">
-      <span class="ribbon-label">Saved Avatars:</span>
+      <span class="ribbon-label">Prebuilt &amp; Saved Avatars:</span>
       <div id="avatar-list" class="avatar-pills-row"></div>
       <button id="btn-save-avatar-ribbon" class="btn-ghost-pill btn-pill-save" title="Save Active Avatar (Photo, Voice &amp; Instructions) to Cloud Storage">&#x1F4BE; Save Avatar</button>
       <button id="btn-download-voice-ribbon" class="btn-ghost-pill" title="Download Active Avatar's Recorded Voice (.wav)">&#x2B07;&#xFE0F; Download Voice</button>
-      <button id="btn-delete-avatar-ribbon" class="btn-ghost-pill btn-pill-delete" title="Delete Active Saved Avatar">&#x1F5D1;&#xFE0F; Delete Avatar</button>
-      <button id="btn-new-avatar-side" class="btn-ghost-pill">+ New Photo / Voice Avatar</button>
+      <button id="btn-delete-avatar-ribbon" class="btn-ghost-pill btn-pill-delete" title="Delete Active Custom Avatar After Use">&#x1F5D1;&#xFE0F; Delete Avatar (After Use)</button>
+      <button id="btn-new-avatar-side" class="btn-ghost-pill">+ Create Your Own Avatar</button>
+    </div>
+    <div class="ribbon-notice-bar" id="prebuilt-usage-notice">
+      <span class="notice-lock-badge">&#x1F512; Prebuilt Avatars (<strong>Aria Chen</strong> &amp; <strong>Dr. Marcus Vance</strong>): Prebuilt Avatars &amp; Prebuilt Voices only (uploading personal photo/voice is disabled).</span>
+      <span class="notice-create-cta">&#x1F4A1; <strong>You can create your own avatar from here</strong> (<button type="button" id="btn-inline-create-avatar" class="inline-cta-link">+ Create Custom Avatar</button>) <strong>and please delete after use</strong> so that nobody else can misuse it.</span>
     </div>
   </section>
 
@@ -301,11 +305,16 @@
       <div class="modal-header">
         <div>
           <h2 id="builder-modal-title" class="modal-title">Create Custom Photo &amp; Voice Avatar</h2>
-          <p id="builder-modal-subtitle" class="modal-subtitle">Saved avatars can be reused anytime with custom knowledge and instructions</p>
+          <p id="builder-modal-subtitle" class="modal-subtitle">You can create your own avatar from here and please delete after use so that nobody else can misuse it</p>
         </div>
         <div class="modal-header-actions">
           <button id="btn-close-builder" class="btn btn-sm btn-outline">Close</button>
         </div>
+      </div>
+
+      <!-- Notice Banner inside Modal -->
+      <div id="builder-modal-notice" class="modal-notice-banner">
+        &#x1F4A1; <strong>You can create your own avatar from here and please delete after use</strong> so that nobody else can misuse it. (For prebuilt avatars <strong>Aria Chen</strong> &amp; <strong>Dr. Marcus Vance</strong>, only Prebuilt Avatars &amp; Prebuilt Voices are allowed.)
       </div>
 
       <!-- Clean 3-Step Wizard Stepper Bar -->
@@ -328,7 +337,7 @@
             <div class="photo-source-tabs">
               <button id="tab-btn-upload-photo" class="sub-tab active">Upload Your Photo</button>
               <button id="tab-btn-webcam-photo" class="sub-tab">Webcam Snapshot</button>
-              <button id="tab-btn-preset-photo" class="sub-tab">Preselected Portraits</button>
+              <button id="tab-btn-preset-photo" class="sub-tab">Prebuilt Avatars (Official EAP)</button>
             </div>
 
             <!-- Upload Photo Box -->
@@ -432,7 +441,7 @@
         <div class="form-row-2">
           <div>
             <label class="field-label">Avatar Name</label>
-            <input id="builder-name" type="text" class="text-input" placeholder="e.g., Vanshika Digital Twin" />
+            <input id="builder-name" type="text" class="text-input" placeholder="e.g., My Custom Digital Twin" />
           </div>
           <div>
             <label class="field-label">Role / Tagline</label>
@@ -453,7 +462,7 @@
         <div class="wizard-footer">
           <button class="btn btn-outline wizard-next-btn" data-next="2">&larr; Back to Voice</button>
           <button id="btn-save-new-avatar" class="btn btn-primary btn-lg">
-            &#x1F4BE; Save Avatar to Studio Library
+            &#x1F4BE; Save Avatar to Studio Library (Delete After Use)
           </button>
         </div>
       </div>
@@ -461,6 +470,7 @@
     </div>
   </div>
 
-  <script src="/static/app.js?v=20261001-nopj"></script>
+  <script src="/static/app.js?v=20261001-prebuilt-lock"></script>
 </body>
 </html>
+

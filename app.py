@@ -74,6 +74,8 @@ PREBUILT_VOICES = [
     {"id": "Charon", "name": "Charon", "style": "Deep, authoritative & clear", "gender": "Male"},
     {"id": "Fenrir", "name": "Fenrir", "style": "Energetic, dynamic & bold", "gender": "Male"},
     {"id": "Zephyr", "name": "Zephyr", "style": "Breezy, natural & empathetic", "gender": "Female"},
+    {"id": "Leda", "name": "Leda", "style": "Bright, clear & engaging", "gender": "Female"},
+    {"id": "Orus", "name": "Orus", "style": "Steady, grounded & confident", "gender": "Male"},
     {"id": "Orbit", "name": "Orbit", "style": "Crisp, analytical & modern", "gender": "Neutral"},
     {"id": "Achernar", "name": "Achernar", "style": "Smooth, poised & executive", "gender": "Female"},
 ]
@@ -81,56 +83,154 @@ PREBUILT_VOICES = [
 PRESET_AVATARS = [
     {
         "id": "preset-aria",
-        "name": "Aria (Custom Photo Portrait)",
+        "name": "Aria Chen (Prebuilt Studio Portrait)",
         "type": "custom_photo",
         "preview_url": "/static/presets/aria.jpg",
         "voice": "Aoede",
-        "badge": "9:16 Studio Portrait",
+        "badge": "Prebuilt 9:16 Avatar",
     },
     {
         "id": "preset-marcus",
-        "name": "Marcus (Custom Photo Portrait)",
+        "name": "Dr. Marcus Vance (Prebuilt Studio Portrait)",
         "type": "custom_photo",
         "preview_url": "/static/presets/marcus.jpg",
         "voice": "Charon",
-        "badge": "9:16 Studio Portrait",
-    },
-    {
-        "id": "preset-elena",
-        "name": "Elena (Custom Photo Portrait)",
-        "type": "custom_photo",
-        "preview_url": "/static/presets/elena.jpg",
-        "voice": "Kore",
-        "badge": "9:16 Studio Portrait",
+        "badge": "Prebuilt 9:16 Avatar",
     },
     {
         "id": "builtin-Kira",
         "name": "Kira (Built-in Gemini Avatar)",
         "type": "builtin",
         "avatar_name": "Kira",
-        "preview_url": "/static/presets/aria.jpg",
+        "preview_url": "/static/presets/kira.jpg",
         "voice": "Aoede",
-        "badge": "Built-in 3D/Live",
+        "badge": "Built-in Live Avatar",
     },
     {
-        "id": "builtin-Kai",
-        "name": "Kai (Built-in Gemini Avatar)",
+        "id": "builtin-Ingrid",
+        "name": "Ingrid (Built-in Gemini Avatar)",
         "type": "builtin",
-        "avatar_name": "Kai",
-        "preview_url": "/static/presets/marcus.jpg",
-        "voice": "Puck",
-        "badge": "Built-in 3D/Live",
+        "avatar_name": "Ingrid",
+        "preview_url": "/static/presets/ingrid.jpg",
+        "voice": "Kore",
+        "badge": "Built-in Live Avatar",
     },
     {
         "id": "builtin-Vera",
         "name": "Vera (Built-in Gemini Avatar)",
         "type": "builtin",
         "avatar_name": "Vera",
-        "preview_url": "/static/presets/elena.jpg",
+        "preview_url": "/static/presets/vera.jpg",
         "voice": "Zephyr",
-        "badge": "Built-in 3D/Live",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Jay",
+        "name": "Jay (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Jay",
+        "preview_url": "/static/presets/jay.jpg",
+        "voice": "Puck",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Paul",
+        "name": "Paul (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Paul",
+        "preview_url": "/static/presets/paul.jpg",
+        "voice": "Charon",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Sam",
+        "name": "Sam (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Sam",
+        "preview_url": "/static/presets/sam.jpg",
+        "voice": "Fenrir",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Piper",
+        "name": "Piper (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Piper",
+        "preview_url": "/static/presets/piper.jpg",
+        "voice": "Leda",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Carmen",
+        "name": "Carmen (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Carmen",
+        "preview_url": "/static/presets/carmen.jpg",
+        "voice": "Aoede",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Leo",
+        "name": "Leo (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Leo",
+        "preview_url": "/static/presets/leo.jpg",
+        "voice": "Orus",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Kai",
+        "name": "Kai (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Kai",
+        "preview_url": "/static/presets/kai.jpg",
+        "voice": "Puck",
+        "badge": "Built-in Live Avatar",
+    },
+    {
+        "id": "builtin-Ben",
+        "name": "Ben (Built-in Gemini Avatar)",
+        "type": "builtin",
+        "avatar_name": "Ben",
+        "preview_url": "/static/presets/ben.jpg",
+        "voice": "Charon",
+        "badge": "Built-in Live Avatar",
     },
 ]
+
+PRESET_PHOTO_MAP = {
+    "preset-aria": "aria.jpg",
+    "preset-marcus": "marcus.jpg",
+    "builtin-Kira": "kira.jpg",
+    "builtin-Ingrid": "ingrid.jpg",
+    "builtin-Vera": "vera.jpg",
+    "builtin-Jay": "jay.jpg",
+    "builtin-Paul": "paul.jpg",
+    "builtin-Sam": "sam.jpg",
+    "builtin-Piper": "piper.jpg",
+    "builtin-Carmen": "carmen.jpg",
+    "builtin-Leo": "leo.jpg",
+    "builtin-Kai": "kai.jpg",
+    "builtin-Ben": "ben.jpg",
+}
+
+PROTECTED_PREBUILT_IDS = {"avatar-aria-architect", "avatar-marcus-advisor"}
+PROTECTED_PREBUILT_NAMES = {"aria chen", "dr. marcus vance"}
+PREBUILT_LOCK_NOTICE = (
+    "Aria Chen and Dr. Marcus Vance are prebuilt avatars — uploading your own photo or voice to them is disabled "
+    "(you may only choose from the Prebuilt Avatars and Prebuilt Voices). "
+    "You can create your own avatar from here (+ Create Custom Avatar) and please delete after use so that nobody else can misuse it."
+)
+
+
+def is_protected_prebuilt_avatar(row: Any) -> bool:
+    if not row:
+        return False
+    row_id = str(row["id"] if "id" in row.keys() else "").strip()
+    row_name = str(row["name"] if "name" in row.keys() else "").strip().lower()
+    return row_id in PROTECTED_PREBUILT_IDS or row_name in PROTECTED_PREBUILT_NAMES
+
+
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB limit
 ALLOWED_KNOWLEDGE_EXTS = {".txt", ".md", ".pdf", ".csv", ".json", ".html"}
@@ -589,10 +689,8 @@ def init_db() -> None:
             """
         )
 
-    # Seed initial showcase avatars if table is empty
-    cur = conn.execute("SELECT COUNT(*) AS cnt FROM avatars;")
-    if cur.fetchone()["cnt"] == 0:
-        seed_default_avatars(conn)
+    # Ensure the 2 Prebuilt Avatars (Aria Chen & Dr. Marcus Vance) always exist
+    seed_default_avatars(conn)
     conn.close()
     if not restored:
         backup_db_to_gcs_sync()
@@ -602,11 +700,9 @@ def seed_default_avatars(conn: sqlite3.Connection) -> None:
     now = int(time.time())
     aria_path = PRESETS_DIR / "aria.jpg"
     marcus_path = PRESETS_DIR / "marcus.jpg"
-    elena_path = PRESETS_DIR / "elena.jpg"
 
     aria_b64 = base64.b64encode(normalize_to_portrait_jpeg(aria_path.read_bytes())).decode() if aria_path.exists() else ""
     marcus_b64 = base64.b64encode(normalize_to_portrait_jpeg(marcus_path.read_bytes())).decode() if marcus_path.exists() else ""
-    elena_b64 = base64.b64encode(normalize_to_portrait_jpeg(elena_path.read_bytes())).decode() if elena_path.exists() else ""
 
     seeds = [
         {
@@ -681,47 +777,69 @@ def seed_default_avatars(conn: sqlite3.Connection) -> None:
     ]
 
     with conn:
-        for s in seeds:
-            conn.execute(
-                """
-                INSERT INTO avatars (
-                    id, name, role_tagline, avatar_mode, builtin_avatar_name,
-                    photo_b64, photo_mime, voice_mode, prebuilt_voice,
-                    custom_voice_b64, custom_voice_mime, system_instruction,
-                    created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, 'image/jpeg', ?, ?, '', 'audio/wav', ?, ?, ?);
-                """,
-                (
-                    s["id"],
-                    s["name"],
-                    s["role_tagline"],
-                    s["avatar_mode"],
-                    s["builtin_avatar_name"],
-                    s["photo_b64"],
-                    s["voice_mode"],
-                    s["prebuilt_voice"],
-                    s["system_instruction"],
-                    now,
-                    now,
-                ),
-            )
-            for k in s["knowledge"]:
+        for idx, s in enumerate(seeds):
+            existing = conn.execute("SELECT id FROM avatars WHERE id = ?;", (s["id"],)).fetchone()
+            if not existing:
                 conn.execute(
                     """
-                    INSERT INTO knowledge_items (
-                        id, avatar_id, title, source_type, source_ref, content, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?);
+                    INSERT INTO avatars (
+                        id, name, role_tagline, avatar_mode, builtin_avatar_name,
+                        photo_b64, photo_mime, voice_mode, prebuilt_voice,
+                        custom_voice_b64, custom_voice_mime, system_instruction,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, 'image/jpeg', ?, ?, '', 'audio/wav', ?, ?, ?);
                     """,
                     (
-                        f"kn-{uuid.uuid4().hex[:10]}",
                         s["id"],
-                        k["title"],
-                        k["source_type"],
-                        k["source_ref"],
-                        k["content"],
-                        now,
+                        s["name"],
+                        s["role_tagline"],
+                        s["avatar_mode"],
+                        s["builtin_avatar_name"],
+                        s["photo_b64"],
+                        s["voice_mode"],
+                        s["prebuilt_voice"],
+                        s["system_instruction"],
+                        now - idx,
+                        now - idx,
                     ),
                 )
+            else:
+                # Enforce official prebuilt portrait and voice for Aria Chen & Dr. Marcus Vance
+                conn.execute(
+                    """
+                    UPDATE avatars
+                    SET name = ?, role_tagline = ?, avatar_mode = 'custom_photo',
+                        photo_b64 = ?, photo_mime = 'image/jpeg',
+                        voice_mode = 'prebuilt', prebuilt_voice = ?, custom_voice_b64 = ''
+                    WHERE id = ?;
+                    """,
+                    (
+                        s["name"],
+                        s["role_tagline"],
+                        s["photo_b64"],
+                        s["prebuilt_voice"],
+                        s["id"],
+                    ),
+                )
+            k_cnt = conn.execute("SELECT COUNT(*) AS cnt FROM knowledge_items WHERE avatar_id = ?;", (s["id"],)).fetchone()["cnt"]
+            if k_cnt == 0:
+                for k in s["knowledge"]:
+                    conn.execute(
+                        """
+                        INSERT INTO knowledge_items (
+                            id, avatar_id, title, source_type, source_ref, content, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?);
+                        """,
+                        (
+                            f"kn-{uuid.uuid4().hex[:10]}",
+                            s["id"],
+                            k["title"],
+                            k["source_type"],
+                            k["source_ref"],
+                            k["content"],
+                            now,
+                        ),
+                    )
 
 
 # ---------------------------------------------------------------------------
@@ -1142,12 +1260,15 @@ def serialize_avatar_row(row: sqlite3.Row, include_knowledge: bool = True) -> Di
     items = get_avatar_knowledge_items(avatar_id) if include_knowledge else []
     has_custom_photo = bool(d.get("photo_b64"))
     has_custom_voice = bool(d.get("custom_voice_b64"))
+    prebuilt_locked = is_protected_prebuilt_avatar(row)
     return {
         "id": avatar_id,
         "name": d["name"],
         "role_tagline": d["role_tagline"],
         "avatar_mode": d["avatar_mode"],
         "builtin_avatar_name": d["builtin_avatar_name"],
+        "is_prebuilt": prebuilt_locked,
+        "is_prebuilt_locked": prebuilt_locked,
         "has_custom_photo": has_custom_photo,
         "photo_data_url": f"data:{d['photo_mime']};base64,{d['photo_b64']}" if has_custom_photo else f"/static/presets/aria.jpg",
         "voice_mode": d["voice_mode"],
@@ -1163,10 +1284,10 @@ def serialize_avatar_row(row: sqlite3.Row, include_knowledge: bool = True) -> Di
 
 
 def _get_kiosk_avatar_row() -> Optional[sqlite3.Row]:
-    """Returns the stage (kiosk) avatar: the most recently updated avatar named 'Vanshika', else the latest avatar."""
+    """Returns the default stage avatar (Aria Chen first, else latest avatar)."""
     conn = get_db()
     row = conn.execute(
-        "SELECT * FROM avatars WHERE lower(trim(name)) = 'vanshika' ORDER BY updated_at DESC LIMIT 1;"
+        "SELECT * FROM avatars WHERE id = 'avatar-aria-architect' OR lower(trim(name)) = 'aria chen' ORDER BY updated_at DESC LIMIT 1;"
     ).fetchone()
     if not row:
         row = conn.execute("SELECT * FROM avatars ORDER BY updated_at DESC LIMIT 1;").fetchone()
@@ -1183,6 +1304,8 @@ async def get_kiosk_avatar_meta():
         "id": row["id"],
         "name": row["name"],
         "role_tagline": row["role_tagline"],
+        "is_prebuilt": is_protected_prebuilt_avatar(row),
+        "is_prebuilt_locked": is_protected_prebuilt_avatar(row),
         "has_custom_photo": bool(row["photo_b64"]),
         "has_custom_voice": bool(row["custom_voice_b64"]),
         "voice_mode": row["voice_mode"],
@@ -1205,7 +1328,18 @@ async def get_kiosk_avatar_photo():
 @app.get("/api/avatars")
 async def list_avatars():
     conn = get_db()
-    rows = conn.execute("SELECT * FROM avatars ORDER BY updated_at DESC;").fetchall()
+    rows = conn.execute(
+        """
+        SELECT * FROM avatars
+        ORDER BY
+            CASE
+                WHEN id = 'avatar-aria-architect' OR lower(trim(name)) = 'aria chen' THEN 0
+                WHEN id = 'avatar-marcus-advisor' OR lower(trim(name)) = 'dr. marcus vance' THEN 1
+                ELSE 2
+            END ASC,
+            updated_at DESC;
+        """
+    ).fetchall()
     conn.close()
     return {"avatars": [serialize_avatar_row(r) for r in rows]}
 
@@ -1259,6 +1393,11 @@ async def create_or_save_avatar(request: Request):
     clean_name = name.strip()[:80]
     if not clean_name:
         raise HTTPException(status_code=400, detail="Avatar name is required.")
+    if clean_name.lower() in PROTECTED_PREBUILT_NAMES:
+        raise HTTPException(
+            status_code=400,
+            detail="Aria Chen and Dr. Marcus Vance are reserved prebuilt avatars. Please enter a unique name for your custom avatar, and delete it after use.",
+        )
 
     photo_b64 = ""
     if photo_file is not None and hasattr(photo_file, "read"):
@@ -1271,12 +1410,8 @@ async def create_or_save_avatar(request: Request):
         norm_img = normalize_to_portrait_jpeg(raw_img)
         photo_b64 = base64.b64encode(norm_img).decode()
     if not photo_b64 and preset_photo_id:
-        preset_map = {
-            "preset-aria": PRESETS_DIR / "aria.jpg",
-            "preset-marcus": PRESETS_DIR / "marcus.jpg",
-            "preset-elena": PRESETS_DIR / "elena.jpg",
-        }
-        p_path = preset_map.get(preset_photo_id, PRESETS_DIR / "aria.jpg")
+        p_filename = PRESET_PHOTO_MAP.get(preset_photo_id, "aria.jpg")
+        p_path = PRESETS_DIR / p_filename
         if p_path.exists():
             photo_b64 = base64.b64encode(normalize_to_portrait_jpeg(p_path.read_bytes())).decode()
     if not photo_b64:
@@ -1360,6 +1495,30 @@ async def update_avatar(avatar_id: str, req: UpdateAvatarRequest):
         conn.close()
         raise HTTPException(status_code=404, detail="Avatar not found")
 
+    if is_protected_prebuilt_avatar(row):
+        if req.voice_mode == "custom_voice":
+            conn.close()
+            raise HTTPException(status_code=403, detail=PREBUILT_LOCK_NOTICE)
+        now = int(time.time())
+        system_instruction = (req.system_instruction if req.system_instruction is not None else row["system_instruction"]).strip()[:6000]
+        prebuilt_voice = (req.prebuilt_voice if req.prebuilt_voice is not None else row["prebuilt_voice"]).strip()[:40]
+        builtin_avatar_name = (req.builtin_avatar_name if req.builtin_avatar_name is not None else row["builtin_avatar_name"]).strip()[:40]
+        avatar_mode = req.avatar_mode if req.avatar_mode in ("custom_photo", "builtin") else row["avatar_mode"]
+        with conn:
+            conn.execute(
+                """
+                UPDATE avatars
+                SET system_instruction = ?, prebuilt_voice = ?, voice_mode = 'prebuilt',
+                    avatar_mode = ?, builtin_avatar_name = ?, updated_at = ?
+                WHERE id = ?;
+                """,
+                (system_instruction, prebuilt_voice, avatar_mode, builtin_avatar_name, now, avatar_id),
+            )
+            updated = conn.execute("SELECT * FROM avatars WHERE id = ?;", (avatar_id,)).fetchone()
+        conn.close()
+        await persist_db_to_gcs()
+        return serialize_avatar_row(updated)
+
     now = int(time.time())
     name = (req.name if req.name is not None else row["name"]).strip()[:80]
     role_tagline = (req.role_tagline if req.role_tagline is not None else row["role_tagline"]).strip()[:140]
@@ -1389,9 +1548,12 @@ async def update_avatar(avatar_id: str, req: UpdateAvatarRequest):
 @app.post("/api/avatars/{avatar_id}/update")
 async def update_avatar_multipart(avatar_id: str, request: Request):
     """
-    Full multipart update for an existing saved avatar: supports re-uploading the portrait photo,
-    recording/uploading a new custom voice WAV, switching to any prebuilt voice, and updating
-    the avatar's name, role tagline, and system instructions.
+    Full multipart update for an existing saved avatar:
+    - For Prebuilt Avatars (`Aria Chen` and `Dr. Marcus Vance`): blocks uploading custom photos
+      or custom voice recordings, while allowing switching between official Prebuilt Avatars
+      (`PRESET_AVATARS`) and Prebuilt Voices (`PREBUILT_VOICES`).
+    - For user-created Custom Avatars: supports re-uploading portrait photos, recording/uploading
+      custom voice WAVs, switching prebuilt voices, and updating name/instructions.
     """
     conn = get_db()
     row = conn.execute("SELECT * FROM avatars WHERE id = ?;", (avatar_id,)).fetchone()
@@ -1419,48 +1581,55 @@ async def update_avatar_multipart(avatar_id: str, request: Request):
     photo_file = form_data.get("photo_file")
     voice_file = form_data.get("voice_file")
 
+    is_locked = is_protected_prebuilt_avatar(row)
+    if is_locked:
+        # Strictly reject any custom photo upload or custom voice upload/recording on Aria Chen & Dr. Marcus Vance
+        has_uploaded_photo = (photo_file is not None and hasattr(photo_file, "read")) or bool(photo_data_url)
+        has_uploaded_voice = (voice_file is not None and hasattr(voice_file, "read")) or bool(voice_data_url) or voice_mode_in == "custom_voice"
+        if has_uploaded_photo or has_uploaded_voice:
+            conn.close()
+            raise HTTPException(status_code=403, detail=PREBUILT_LOCK_NOTICE)
+
     # 1. Resolve updated photo (or keep existing photo_b64)
     photo_b64 = row["photo_b64"]
     avatar_mode = avatar_mode_in if avatar_mode_in in ("custom_photo", "builtin") else row["avatar_mode"]
-    if photo_file is not None and hasattr(photo_file, "read"):
+    if not is_locked and photo_file is not None and hasattr(photo_file, "read"):
         raw_img = await photo_file.read()
         if raw_img:
             photo_b64 = base64.b64encode(normalize_to_portrait_jpeg(raw_img)).decode()
             avatar_mode = "custom_photo"
-    elif photo_data_url and "," in photo_data_url:
+    elif not is_locked and photo_data_url and "," in photo_data_url:
         raw_img = base64.b64decode(photo_data_url.split(",", 1)[1])
         photo_b64 = base64.b64encode(normalize_to_portrait_jpeg(raw_img)).decode()
         avatar_mode = "custom_photo"
     elif preset_photo_id:
-        preset_map = {
-            "preset-aria": PRESETS_DIR / "aria.jpg",
-            "preset-marcus": PRESETS_DIR / "marcus.jpg",
-            "preset-elena": PRESETS_DIR / "elena.jpg",
-        }
-        p_path = preset_map.get(preset_photo_id)
-        if p_path and p_path.exists():
-            photo_b64 = base64.b64encode(normalize_to_portrait_jpeg(p_path.read_bytes())).decode()
-            avatar_mode = "custom_photo"
+        p_filename = PRESET_PHOTO_MAP.get(preset_photo_id)
+        if p_filename:
+            p_path = PRESETS_DIR / p_filename
+            if p_path.exists():
+                photo_b64 = base64.b64encode(normalize_to_portrait_jpeg(p_path.read_bytes())).decode()
+                avatar_mode = "builtin" if preset_photo_id.startswith("builtin-") else "custom_photo"
 
     # 2. Resolve updated voice (new custom WAV, or switch to prebuilt voice, or keep existing)
-    custom_voice_b64 = row["custom_voice_b64"]
-    voice_mode = voice_mode_in if voice_mode_in in ("custom_voice", "prebuilt") else row["voice_mode"]
-    if voice_file is not None and hasattr(voice_file, "read"):
+    custom_voice_b64 = "" if is_locked else row["custom_voice_b64"]
+    voice_mode = "prebuilt" if is_locked else (voice_mode_in if voice_mode_in in ("custom_voice", "prebuilt") else row["voice_mode"])
+    if not is_locked and voice_file is not None and hasattr(voice_file, "read"):
         raw_aud = await voice_file.read()
         if raw_aud:
             custom_voice_b64 = base64.b64encode(normalize_to_wav_24k(raw_aud)).decode()
             voice_mode = "custom_voice"
-    elif voice_data_url and "," in voice_data_url:
+    elif not is_locked and voice_data_url and "," in voice_data_url:
         raw_aud = base64.b64decode(voice_data_url.split(",", 1)[1])
         custom_voice_b64 = base64.b64encode(normalize_to_wav_24k(raw_aud)).decode()
         voice_mode = "custom_voice"
 
-    name = (name_in if name_in else row["name"])[:80]
-    role_tagline = (role_in if role_in is not None else row["role_tagline"])[:140]
+    name = row["name"] if is_locked else (name_in if name_in else row["name"])[:80]
+    role_tagline = row["role_tagline"] if is_locked else (role_in if role_in is not None else row["role_tagline"])[:140]
     system_instruction = (sys_in if sys_in is not None else row["system_instruction"])[:6000]
     prebuilt_voice = (prebuilt_voice_in if prebuilt_voice_in else row["prebuilt_voice"])[:40]
     builtin_avatar_name = (builtin_avatar_in if builtin_avatar_in else row["builtin_avatar_name"])[:40]
     now = int(time.time())
+
 
     with conn:
         conn.execute(
@@ -1494,7 +1663,6 @@ async def update_avatar_multipart(avatar_id: str, request: Request):
     return serialize_avatar_row(updated)
 
 
-
 @app.get("/api/avatars/{avatar_id}/voice/download")
 async def download_avatar_voice(avatar_id: str):
     conn = get_db()
@@ -1525,6 +1693,12 @@ async def delete_avatar(avatar_id: str):
     if not row:
         conn.close()
         raise HTTPException(status_code=404, detail="Avatar not found")
+    if is_protected_prebuilt_avatar(row):
+        conn.close()
+        raise HTTPException(
+            status_code=403,
+            detail="Aria Chen and Dr. Marcus Vance are prebuilt avatars and cannot be deleted. You can create your own custom avatar and delete it after use.",
+        )
     total = conn.execute("SELECT COUNT(*) AS cnt FROM avatars;").fetchone()["cnt"]
     if total <= 1:
         conn.close()
@@ -1620,6 +1794,9 @@ async def update_avatar_photo(avatar_id: str, request: Request):
     if not row:
         conn.close()
         raise HTTPException(status_code=404, detail="Avatar not found")
+    if is_protected_prebuilt_avatar(row):
+        conn.close()
+        raise HTTPException(status_code=403, detail=PREBUILT_LOCK_NOTICE)
 
     form_data = await request.form(max_part_size=50 * 1024 * 1024, max_files=5, max_fields=10)
     photo_file = form_data.get("photo_file")
@@ -1691,6 +1868,9 @@ async def update_avatar_voice(avatar_id: str, request: Request):
     if not row:
         conn.close()
         raise HTTPException(status_code=404, detail="Avatar not found")
+    if is_protected_prebuilt_avatar(row):
+        conn.close()
+        raise HTTPException(status_code=403, detail=PREBUILT_LOCK_NOTICE)
 
     form_data = await request.form(max_part_size=50 * 1024 * 1024, max_files=5, max_fields=10)
     voice_file = form_data.get("voice_file")

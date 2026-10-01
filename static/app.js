@@ -119,7 +119,7 @@
         previewImg.style.display = "block";
       }
       const stagePoster = document.getElementById("stage-poster-img");
-      if (stagePoster) {
+      if (stagePoster && (!state.activeAvatar || (state.editingAvatarId && !isPrebuiltLockedAvatar(state.activeAvatar)))) {
         stagePoster.src = dataUrl;
       }
     }
@@ -129,6 +129,19 @@
       statusEl.textContent = labelText || "Cropped to 704x1280 (9:16)";
     }
     return dataUrl;
+  }
+
+  function isPrebuiltLockedAvatar(av) {
+    if (!av) return false;
+    if (av.is_prebuilt_locked || av.is_prebuilt) return true;
+    const id = (av.id || "").trim();
+    const name = (av.name || "").trim().toLowerCase();
+    return (
+      id === "avatar-aria-architect" ||
+      id === "avatar-marcus-advisor" ||
+      name === "aria chen" ||
+      name === "dr. marcus vance"
+    );
   }
 
   function loadUrlIntoPortraitCanvas(url, labelText, isUserUpload) {
@@ -213,6 +226,7 @@
     listEl.replaceChildren();
 
     state.avatars.forEach((av) => {
+      const isLocked = isPrebuiltLockedAvatar(av);
       const card = document.createElement("div");
       card.className = "avatar-card" + (state.activeAvatar && state.activeAvatar.id === av.id ? " active" : "");
 
@@ -225,10 +239,22 @@
       nameEl.className = "avatar-card-name";
       nameEl.textContent = av.name;
 
+      card.appendChild(thumb);
+      card.appendChild(nameEl);
+
+      if (isLocked) {
+        const chip = document.createElement("span");
+        chip.className = "prebuilt-chip";
+        chip.textContent = "Prebuilt";
+        card.appendChild(chip);
+      }
+
       const editBtn = document.createElement("button");
       editBtn.type = "button";
       editBtn.className = "avatar-card-edit-btn";
-      editBtn.title = "Edit " + av.name + " (Change Voice or Re-upload Photo)";
+      editBtn.title = isLocked
+        ? "Choose Prebuilt Avatar or Prebuilt Voice for " + av.name
+        : "Edit " + av.name + " (Change Voice or Re-upload Photo)";
       editBtn.textContent = "\u270E";
       editBtn.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -237,10 +263,20 @@
           window.__openEditAvatarModal(state.activeAvatar || av);
         }
       });
-
-      card.appendChild(thumb);
-      card.appendChild(nameEl);
       card.appendChild(editBtn);
+
+      if (!isLocked) {
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "avatar-card-edit-btn";
+        delBtn.title = "Delete Custom Avatar '" + av.name + "' (Please delete after use)";
+        delBtn.textContent = "\uD83D\uDDD1\uFE0F";
+        delBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          await deleteAvatarById(av.id, av.name);
+        });
+        card.appendChild(delBtn);
+      }
 
       card.addEventListener("click", () => {
         selectAvatar(av.id);
@@ -307,12 +343,19 @@
       showToast("Select a saved avatar first.");
       return false;
     }
+    const targetAv = state.avatars.find((a) => a.id === avatarId) || state.activeAvatar;
+    if (isPrebuiltLockedAvatar(targetAv) || avatarId === "avatar-aria-architect" || avatarId === "avatar-marcus-advisor") {
+      showToast(
+        "Aria Chen & Dr. Marcus Vance are protected Prebuilt Avatars. Create your own custom avatar (+ Create Custom Avatar) and delete it after use."
+      );
+      return false;
+    }
     if (state.avatars.length <= 1) {
       showToast("Cannot delete the last remaining avatar in the Studio.");
       return false;
     }
     const label = avatarName || avatarId;
-    if (typeof window.confirm === "function" && !window.confirm("Delete avatar '" + label + "'?")) {
+    if (typeof window.confirm === "function" && !window.confirm("Delete custom avatar '" + label + "'?")) {
       return false;
     }
     try {
@@ -332,7 +375,7 @@
       if (modal && !modal.classList.contains("hidden")) {
         modal.classList.add("hidden");
       }
-      showToast("Deleted avatar '" + label + "'.");
+      showToast("Deleted custom avatar '" + label + "'.");
       if (state.activeAvatar && state.activeAvatar.id === avatarId) {
         if (state.avatars.length > 0) {
           await selectAvatar(state.avatars[0].id);
@@ -353,6 +396,7 @@
       return null;
     }
     const av = state.activeAvatar;
+    const isLocked = isPrebuiltLockedAvatar(av);
     const sysInput = document.getElementById("active-system-instruction");
     const sysVal = sysInput ? sysInput.value.trim() : av.system_instruction || "";
 
@@ -361,15 +405,17 @@
     fd.append("role_tagline", av.role_tagline || "Custom Photo & Voice Persona");
     fd.append("avatar_mode", av.avatar_mode || "custom_photo");
     fd.append("builtin_avatar_name", av.builtin_avatar_name || "Kira");
-    fd.append("voice_mode", av.voice_mode || "custom_voice");
+    fd.append("voice_mode", isLocked ? "prebuilt" : av.voice_mode || "custom_voice");
     fd.append("prebuilt_voice", av.prebuilt_voice || "Aoede");
     fd.append("system_instruction", sysVal);
 
-    if (state.uploadedPhotoFile) {
-      fd.append("photo_file", state.uploadedPhotoFile, state.uploadedPhotoFile.name || "custom_photo.jpg");
-    }
-    if (state.uploadedVoiceFile) {
-      fd.append("voice_file", state.uploadedVoiceFile, state.uploadedVoiceFile.name || "custom_voice.wav");
+    if (!isLocked) {
+      if (state.uploadedPhotoFile) {
+        fd.append("photo_file", state.uploadedPhotoFile, state.uploadedPhotoFile.name || "custom_photo.jpg");
+      }
+      if (state.uploadedVoiceFile) {
+        fd.append("voice_file", state.uploadedVoiceFile, state.uploadedVoiceFile.name || "custom_voice.wav");
+      }
     }
 
     try {
@@ -388,7 +434,7 @@
       if (idx >= 0) state.avatars[idx] = saved;
       renderAvatarsList();
       renderActiveAvatarStage();
-      showToast("\u2713 Saved '" + saved.name + "' (Photo, Voice & Instructions) to Cloud Storage!");
+      showToast("\u2713 Saved '" + saved.name + "' to Cloud Storage!");
       return saved;
     } catch (err) {
       showToast("Save Error: " + err.message);
@@ -428,6 +474,7 @@
     const av = state.activeAvatar;
     if (!av) return;
 
+    const isLocked = isPrebuiltLockedAvatar(av);
     const posterEl = document.getElementById("stage-poster-img");
     const videoEl = document.getElementById("live-avatar-video");
     const nameEl = document.getElementById("stage-avatar-name");
@@ -436,6 +483,31 @@
     const badgeKb = document.getElementById("stage-badge-kb");
     const navKbCount = document.getElementById("nav-kb-count");
     const sysInput = document.getElementById("active-system-instruction");
+
+    const uploadOverlayBtn = document.getElementById("btn-stage-upload-overlay");
+    const editStageBtn = document.getElementById("btn-edit-active-avatar");
+    const editHeaderBtn = document.getElementById("btn-edit-avatar-header");
+    const deleteRibbonBtn = document.getElementById("btn-delete-avatar-ribbon");
+    const downloadVoiceRibbonBtn = document.getElementById("btn-download-voice-ribbon");
+
+    if (uploadOverlayBtn) {
+      uploadOverlayBtn.style.display = isLocked ? "none" : "";
+    }
+    if (deleteRibbonBtn) {
+      deleteRibbonBtn.style.display = isLocked ? "none" : "";
+    }
+    if (downloadVoiceRibbonBtn) {
+      downloadVoiceRibbonBtn.style.display = isLocked ? "none" : "";
+    }
+    if (editStageBtn) {
+      editStageBtn.textContent = isLocked ? "\uD83C\uDFAD Choose Prebuilt Avatar / Voice" : "\u270E Edit Voice / Photo";
+      editStageBtn.title = isLocked
+        ? "Choose from official Prebuilt Avatars & Prebuilt Voices only (custom photo/voice upload disabled for " + av.name + ")"
+        : "Edit Voice or Re-upload Photo for this saved avatar";
+    }
+    if (editHeaderBtn) {
+      editHeaderBtn.textContent = isLocked ? "\uD83C\uDFAD Choose Prebuilt Avatar / Voice" : "\u270E Edit Photo / Voice";
+    }
 
     const kbLen = (av.knowledge_items || []).length;
     const photoUrl = av.photo_data_url || "/static/presets/aria.jpg";
@@ -451,10 +523,16 @@
     }
     if (nameEl) nameEl.textContent = av.name;
     if (badgePhoto) {
-      badgePhoto.textContent = av.avatar_mode === "custom_photo" ? "Custom Photo (9:16)" : "Built-in: " + av.builtin_avatar_name;
+      if (isLocked) {
+        badgePhoto.textContent =
+          av.avatar_mode === "builtin" ? "Prebuilt Built-in: " + av.builtin_avatar_name : "Prebuilt Avatar (" + av.name + ")";
+      } else {
+        badgePhoto.textContent =
+          av.avatar_mode === "custom_photo" ? "Custom Photo (9:16)" : "Built-in: " + av.builtin_avatar_name;
+      }
     }
     if (badgeVoice) {
-      badgeVoice.textContent = av.voice_mode === "custom_voice" ? "Custom Cloned Voice" : "Voice: " + av.prebuilt_voice;
+      badgeVoice.textContent = av.voice_mode === "custom_voice" ? "Custom Cloned Voice" : "Prebuilt Voice: " + av.prebuilt_voice;
     }
     if (badgeKb) {
       badgeKb.textContent = String(kbLen) + " Knowledge Sources";
@@ -1268,6 +1346,11 @@
   async function applyUploadedPhotoToActiveAvatar(file, photoDataUrl) {
     const targetId = state.editingAvatarId || (state.activeAvatar && state.activeAvatar.id);
     if (!targetId) return null;
+    const targetAv = state.avatars.find((a) => a.id === targetId) || state.activeAvatar;
+    // Never overwrite protected prebuilt avatars (Aria Chen & Dr. Marcus Vance) or mutate active avatar when in Create mode
+    if (!state.editingAvatarId || isPrebuiltLockedAvatar(targetAv)) {
+      return null;
+    }
     const fd = new FormData();
     if (file) {
       fd.append("photo_file", file, file.name || "custom_photo.jpg");
@@ -1301,6 +1384,11 @@
   async function applyUploadedVoiceToActiveAvatar(file, voiceDataUrl) {
     const targetId = state.editingAvatarId || (state.activeAvatar && state.activeAvatar.id);
     if (!targetId) return null;
+    const targetAv = state.avatars.find((a) => a.id === targetId) || state.activeAvatar;
+    // Never overwrite protected prebuilt avatars (Aria Chen & Dr. Marcus Vance) or mutate active avatar when in Create mode
+    if (!state.editingAvatarId || isPrebuiltLockedAvatar(targetAv)) {
+      return null;
+    }
     const fd = new FormData();
     if (file) {
       fd.append("voice_file", file, file.name || "custom_voice.wav");
@@ -1338,6 +1426,7 @@
     const modal = document.getElementById("builder-modal");
     const openBtn = document.getElementById("btn-open-builder");
     const openSideBtn = document.getElementById("btn-new-avatar-side");
+    const inlineCreateBtn = document.getElementById("btn-inline-create-avatar");
     const editHeaderBtn = document.getElementById("btn-edit-avatar-header");
     const editStageBtn = document.getElementById("btn-edit-active-avatar");
     const saveRibbonBtn = document.getElementById("btn-save-avatar-ribbon");
@@ -1347,15 +1436,51 @@
     const closeBtn = document.getElementById("btn-close-builder");
     const stageDirectInput = document.getElementById("stage-direct-photo-input");
 
+    // Photo & Voice source tabs
+    const tabUpload = document.getElementById("tab-btn-upload-photo");
+    const tabWebcam = document.getElementById("tab-btn-webcam-photo");
+    const tabPreset = document.getElementById("tab-btn-preset-photo");
+    const paneUpload = document.getElementById("photo-pane-upload");
+    const paneWebcam = document.getElementById("photo-pane-webcam");
+    const panePreset = document.getElementById("photo-pane-preset");
+
+    const tabRecVoice = document.getElementById("tab-btn-record-voice");
+    const tabPreVoice = document.getElementById("tab-btn-prebuilt-voice");
+    const paneRecVoice = document.getElementById("voice-pane-record");
+    const panePreVoice = document.getElementById("voice-pane-prebuilt");
+
+    function activatePhotoTab(which) {
+      [tabUpload, tabWebcam, tabPreset].forEach((b) => b && b.classList.remove("active"));
+      [paneUpload, paneWebcam, panePreset].forEach((p) => p && p.classList.remove("active"));
+      if (which === "upload" && tabUpload && paneUpload) {
+        tabUpload.classList.add("active");
+        paneUpload.classList.add("active");
+      } else if (which === "webcam" && tabWebcam && paneWebcam) {
+        tabWebcam.classList.add("active");
+        paneWebcam.classList.add("active");
+      } else if (tabPreset && panePreset) {
+        tabPreset.classList.add("active");
+        panePreset.classList.add("active");
+      }
+    }
+
     if (stageDirectInput) {
       stageDirectInput.addEventListener("change", async (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
+        if (isPrebuiltLockedAvatar(state.activeAvatar)) {
+          showToast(
+            "Uploading personal photos is disabled for Aria Chen & Dr. Marcus Vance. Click '+ Create Custom Avatar' to create your own avatar and delete after use!"
+          );
+          return;
+        }
         const objectUrl = URL.createObjectURL(file);
         const posterEl = document.getElementById("stage-poster-img");
         if (posterEl) posterEl.src = objectUrl;
         showToast("Uploading & applying your photo to stage...");
+        state.editingAvatarId = state.activeAvatar && state.activeAvatar.id;
         const updated = await applyUploadedPhotoToActiveAvatar(file, "");
+        state.editingAvatarId = null;
         if (updated) {
           showToast("Your custom photo is now active on stage!");
         }
@@ -1370,20 +1495,48 @@
       state.builderVoiceDataUrl = "";
       state.builderAvatarMode = "custom_photo";
       state.builderPresetId = "";
+      state.builderVoiceMode = "custom_voice";
 
       const titleEl = document.getElementById("builder-modal-title");
       const subEl = document.getElementById("builder-modal-subtitle");
+      const noticeEl = document.getElementById("builder-modal-notice");
       const btnSave = document.getElementById("btn-save-new-avatar");
       const nameIn = document.getElementById("builder-name");
       const tagIn = document.getElementById("builder-tagline");
       const sysIn = document.getElementById("builder-instructions");
 
-      if (titleEl) titleEl.textContent = "Create Custom Photo & Voice Avatar";
-      if (subEl) subEl.textContent = "Saved avatars can be reused anytime with custom knowledge and instructions";
-      if (btnSave) btnSave.textContent = "Save Reusable Avatar to Studio Library";
-      if (nameIn) nameIn.value = "";
-      if (tagIn) tagIn.value = "";
+      if (titleEl) titleEl.textContent = "Create Your Own Custom Photo & Voice Avatar";
+      if (subEl) {
+        subEl.textContent =
+          "Upload your own photo & voice (or choose a prebuilt option) — please delete your custom avatar after use so that nobody else can misuse it.";
+      }
+      if (noticeEl) {
+        noticeEl.textContent =
+          "\uD83D\uDCA1 You can create your own avatar from here (upload your own photo & record/upload your voice) and please delete after use so that nobody else can misuse it.";
+      }
+      if (btnSave) btnSave.textContent = "Save Custom Avatar to Studio Library";
+      if (nameIn) {
+        nameIn.value = "";
+        nameIn.readOnly = false;
+      }
+      if (tagIn) {
+        tagIn.value = "";
+        tagIn.readOnly = false;
+      }
       if (sysIn) sysIn.value = "";
+
+      if (tabUpload) tabUpload.style.display = "";
+      if (tabWebcam) tabWebcam.style.display = "";
+      if (tabRecVoice) tabRecVoice.style.display = "";
+      if (downloadVoiceModalBtn) downloadVoiceModalBtn.style.display = "";
+      activatePhotoTab("upload");
+
+      if (tabRecVoice && tabPreVoice && paneRecVoice && panePreVoice) {
+        tabRecVoice.classList.add("active");
+        tabPreVoice.classList.remove("active");
+        paneRecVoice.classList.add("active");
+        panePreVoice.classList.remove("active");
+      }
 
       if (modal) modal.classList.remove("hidden");
       switchWizardStep(1);
@@ -1405,6 +1558,7 @@
         showToast("Select a saved avatar first.");
         return;
       }
+      const isLocked = isPrebuiltLockedAvatar(target);
       state.editingAvatarId = target.id;
       state.uploadedPhotoFile = null;
       state.uploadedVoiceFile = null;
@@ -1413,37 +1567,86 @@
       state.builderPresetId = "";
       state.builderAvatarMode = target.avatar_mode || "custom_photo";
       state.builderBuiltinName = target.builtin_avatar_name || "Kira";
-      state.builderVoiceMode = target.voice_mode || "prebuilt";
+      state.builderVoiceMode = isLocked ? "prebuilt" : target.voice_mode || "prebuilt";
       state.builderPrebuiltVoice = target.prebuilt_voice || "Aoede";
 
       const titleEl = document.getElementById("builder-modal-title");
       const subEl = document.getElementById("builder-modal-subtitle");
+      const noticeEl = document.getElementById("builder-modal-notice");
       const btnSave = document.getElementById("btn-save-new-avatar");
       const nameIn = document.getElementById("builder-name");
       const tagIn = document.getElementById("builder-tagline");
       const sysIn = document.getElementById("builder-instructions");
 
-      if (titleEl) titleEl.textContent = "Edit Saved Avatar: " + target.name;
-      if (subEl) subEl.textContent = "Re-upload a new photo, record or pick a different voice, or update name & instructions";
-      if (btnSave) btnSave.textContent = "\u2713 Save Changes to '" + target.name + "'";
-      if (nameIn) nameIn.value = target.name || "";
-      if (tagIn) tagIn.value = target.role_tagline || "";
+      if (isLocked) {
+        if (titleEl) {
+          titleEl.textContent =
+            "Prebuilt Avatar: " + target.name + " (Choose Prebuilt Avatars & Prebuilt Voices Only)";
+        }
+        if (subEl) {
+          subEl.textContent =
+            "Uploading personal photos or voices is disabled for " +
+            target.name +
+            ". Choose from official Gemini 3.8 Prebuilt Avatars & Prebuilt Voices below, or click '+ Create Custom Avatar' to create your own.";
+        }
+        if (noticeEl) {
+          noticeEl.textContent =
+            "\uD83D\uDD12 Protected Prebuilt Avatar (" +
+            target.name +
+            "): Personal photo & voice uploads are disabled. Choose from official Prebuilt Avatars (Kira, Ingrid, Vera, Jay, Paul, Sam, Piper, Carmen, Leo, Kai, Ben, Aria Chen, Dr. Marcus Vance) & Prebuilt Voices only. \uD83D\uDCA1 You can create your own avatar from '+ Create Custom Avatar' and please delete after use so that nobody else can misuse it.";
+        }
+        if (btnSave) btnSave.textContent = "\u2713 Save Prebuilt Avatar / Voice for '" + target.name + "'";
+        if (nameIn) {
+          nameIn.value = target.name || "";
+          nameIn.readOnly = true;
+        }
+        if (tagIn) {
+          tagIn.value = target.role_tagline || "";
+          tagIn.readOnly = true;
+        }
+        if (tabUpload) tabUpload.style.display = "none";
+        if (tabWebcam) tabWebcam.style.display = "none";
+        if (tabRecVoice) tabRecVoice.style.display = "none";
+        if (downloadVoiceModalBtn) downloadVoiceModalBtn.style.display = "none";
+        activatePhotoTab("preset");
+      } else {
+        if (titleEl) titleEl.textContent = "Edit Custom Avatar: " + target.name;
+        if (subEl) {
+          subEl.textContent =
+            "Re-upload a new photo, record or pick a different voice, or delete this custom avatar after use.";
+        }
+        if (noticeEl) {
+          noticeEl.textContent =
+            "\uD83D\uDCA1 Custom Avatar ('" +
+            target.name +
+            "'): Please remember to delete your custom avatar after use (\uD83D\uDDD1\uFE0F Delete Avatar After Use) so that nobody else can misuse it.";
+        }
+        if (btnSave) btnSave.textContent = "\u2713 Save Changes to '" + target.name + "'";
+        if (nameIn) {
+          nameIn.value = target.name || "";
+          nameIn.readOnly = false;
+        }
+        if (tagIn) {
+          tagIn.value = target.role_tagline || "";
+          tagIn.readOnly = false;
+        }
+        if (tabUpload) tabUpload.style.display = "";
+        if (tabWebcam) tabWebcam.style.display = "";
+        if (tabRecVoice) tabRecVoice.style.display = "";
+        if (downloadVoiceModalBtn) downloadVoiceModalBtn.style.display = "";
+        activatePhotoTab("upload");
+      }
       if (sysIn) sysIn.value = target.system_instruction || "";
 
       if (modal) modal.classList.remove("hidden");
       switchWizardStep(startStep || 1);
 
-      const tabRecVoice = document.getElementById("tab-btn-record-voice");
-      const tabPreVoice = document.getElementById("tab-btn-prebuilt-voice");
-      const paneRecVoice = document.getElementById("voice-pane-record");
-      const panePreVoice = document.getElementById("voice-pane-prebuilt");
       const audioPlayer = document.getElementById("recorded-voice-audio");
-
       if (audioPlayer) {
-        audioPlayer.src = target.custom_voice_data_url || "";
+        audioPlayer.src = isLocked ? "" : target.custom_voice_data_url || "";
       }
       if (tabRecVoice && tabPreVoice && paneRecVoice && panePreVoice) {
-        if (target.voice_mode === "prebuilt") {
+        if (isLocked || target.voice_mode === "prebuilt") {
           tabPreVoice.classList.add("active");
           tabRecVoice.classList.remove("active");
           panePreVoice.classList.add("active");
@@ -1456,8 +1659,7 @@
         }
       }
 
-      // Display-only: show the current photo WITHOUT flagging it as a new upload, so saving a
-      // voice-only change never re-uploads (and re-compresses) the existing photo.
+      // Display-only: show the current photo WITHOUT flagging it as a new upload
       const currentPhotoUrl = target.photo_data_url || "/static/presets/aria.jpg";
       const previewImgEl = document.getElementById("builder-photo-preview-img");
       if (previewImgEl) {
@@ -1466,7 +1668,9 @@
       }
       loadUrlIntoPortraitCanvas(
         currentPhotoUrl,
-        "Current Photo: " + target.name + " (upload a new image on the left to replace)",
+        isLocked
+          ? "Prebuilt Avatar: " + target.name + " (select an official Prebuilt Avatar tile on the left)"
+          : "Current Photo: " + target.name + " (upload a new image on the left to replace)",
         false
       );
       populateBuilderPresetsAndVoices();
@@ -1481,6 +1685,7 @@
 
     if (openBtn) openBtn.addEventListener("click", openCreateModal);
     if (openSideBtn) openSideBtn.addEventListener("click", openCreateModal);
+    if (inlineCreateBtn) inlineCreateBtn.addEventListener("click", openCreateModal);
     if (editHeaderBtn) editHeaderBtn.addEventListener("click", () => openEditAvatarModal(state.activeAvatar, 1));
     if (editStageBtn) editStageBtn.addEventListener("click", () => openEditAvatarModal(state.activeAvatar, 1));
     if (saveRibbonBtn) saveRibbonBtn.addEventListener("click", () => saveActiveAvatarNow());
@@ -1506,29 +1711,6 @@
       });
     });
 
-    // Photo source tabs
-    const tabUpload = document.getElementById("tab-btn-upload-photo");
-    const tabWebcam = document.getElementById("tab-btn-webcam-photo");
-    const tabPreset = document.getElementById("tab-btn-preset-photo");
-    const paneUpload = document.getElementById("photo-pane-upload");
-    const paneWebcam = document.getElementById("photo-pane-webcam");
-    const panePreset = document.getElementById("photo-pane-preset");
-
-    function activatePhotoTab(which) {
-      [tabUpload, tabWebcam, tabPreset].forEach((b) => b && b.classList.remove("active"));
-      [paneUpload, paneWebcam, panePreset].forEach((p) => p && p.classList.remove("active"));
-      if (which === "upload") {
-        tabUpload.classList.add("active");
-        paneUpload.classList.add("active");
-      } else if (which === "webcam") {
-        tabWebcam.classList.add("active");
-        paneWebcam.classList.add("active");
-      } else {
-        tabPreset.classList.add("active");
-        panePreset.classList.add("active");
-      }
-    }
-
     if (tabUpload) tabUpload.addEventListener("click", () => activatePhotoTab("upload"));
     if (tabWebcam) tabWebcam.addEventListener("click", () => activatePhotoTab("webcam"));
     if (tabPreset) tabPreset.addEventListener("click", () => activatePhotoTab("preset"));
@@ -1540,16 +1722,28 @@
 
     async function handlePhotoFileSelected(file) {
       if (!file) return;
+      const editingAv = state.editingAvatarId
+        ? state.avatars.find((a) => a.id === state.editingAvatarId) || state.activeAvatar
+        : null;
+      if (state.editingAvatarId && isPrebuiltLockedAvatar(editingAv)) {
+        showToast(
+          "Personal photo upload is disabled for Aria Chen & Dr. Marcus Vance. Click '+ Create Custom Avatar' to create your own!"
+        );
+        return;
+      }
       state.uploadedPhotoFile = file;
       state.builderAvatarMode = "custom_photo";
+      state.builderPresetId = "";
 
       // 1. Immediate local preview via Object URL + FileReader
       const objUrl = URL.createObjectURL(file);
       loadUrlIntoPortraitCanvas(objUrl, "Uploaded '" + file.name + "' (9:16)", true);
-      const posterEl = document.getElementById("stage-poster-img");
-      if (posterEl) posterEl.src = objUrl;
+      if (state.editingAvatarId && !isPrebuiltLockedAvatar(editingAv)) {
+        const posterEl = document.getElementById("stage-poster-img");
+        if (posterEl) posterEl.src = objUrl;
+      }
 
-      // 2. Server-side FFmpeg 704x1280 9:16 normalization preview + immediate stage apply
+      // 2. Server-side FFmpeg 704x1280 9:16 normalization preview (+ stage apply if editing a custom avatar)
       try {
         const fd = new FormData();
         fd.append("photo_file", file, file.name || "custom_photo.jpg");
@@ -1561,20 +1755,24 @@
             loadUrlIntoPortraitCanvas(data.photo_data_url, "Uploaded '" + file.name + "' (9:16)", true);
           }
         }
-        // Also immediately apply to the currently active avatar so even if the modal is closed,
-        // the user's uploaded photo is persisted and displayed on the main stage!
-        const updated = await applyUploadedPhotoToActiveAvatar(file, state.builderPhotoDataUrl);
-        if (updated && updated.photo_data_url) {
-          state.builderPhotoDataUrl = updated.photo_data_url;
-          const previewImg = document.getElementById("builder-photo-preview-img");
-          if (previewImg) {
-            previewImg.src = updated.photo_data_url;
-            previewImg.style.display = "block";
+        if (state.editingAvatarId && !isPrebuiltLockedAvatar(editingAv)) {
+          const updated = await applyUploadedPhotoToActiveAvatar(file, state.builderPhotoDataUrl);
+          if (updated && updated.photo_data_url) {
+            state.builderPhotoDataUrl = updated.photo_data_url;
+            const previewImg = document.getElementById("builder-photo-preview-img");
+            if (previewImg) {
+              previewImg.src = updated.photo_data_url;
+              previewImg.style.display = "block";
+            }
           }
         }
       } catch (e) {}
 
-      showToast("Custom photo uploaded, normalized to 9:16 & applied to stage!");
+      showToast(
+        state.editingAvatarId
+          ? "Custom photo uploaded, normalized to 9:16 & applied to stage!"
+          : "Custom photo normalized to 9:16! Continue to Step 2 & Step 3 to save your custom avatar."
+      );
     }
 
     if (photoInput) {
@@ -1597,13 +1795,25 @@
 
     if (btnApplyStep1) {
       btnApplyStep1.addEventListener("click", async () => {
-        if (state.uploadedPhotoFile || state.builderPhotoDataUrl) {
+        const editingAv = state.editingAvatarId
+          ? state.avatars.find((a) => a.id === state.editingAvatarId) || state.activeAvatar
+          : null;
+        if (state.editingAvatarId && state.builderPresetId) {
+          await saveBuilderModalAvatar();
+          return;
+        }
+        if (state.editingAvatarId && !isPrebuiltLockedAvatar(editingAv) && (state.uploadedPhotoFile || state.builderPhotoDataUrl)) {
           await applyUploadedPhotoToActiveAvatar(state.uploadedPhotoFile, state.builderPhotoDataUrl);
           closeModal();
           showToast("Saved & applied your custom photo to the stage!");
-        } else {
-          showToast("Please upload a photo or choose a portrait first.");
+          return;
         }
+        if (!state.editingAvatarId && (state.uploadedPhotoFile || state.builderPhotoDataUrl || state.builderPresetId)) {
+          switchWizardStep(2);
+          showToast("Photo ready! Now choose or record a voice in Step 2, then Save in Step 3.");
+          return;
+        }
+        showToast("Please select a Prebuilt Avatar or upload a photo first.");
       });
     }
 
@@ -1628,17 +1838,15 @@
         if (camVideo && camVideo.videoWidth) {
           const snapUrl = drawImageToPortraitCanvas(camVideo, "Webcam snapshot captured (9:16)!", true);
           state.uploadedPhotoFile = null;
-          await applyUploadedPhotoToActiveAvatar(null, snapUrl);
-          showToast("Webcam photo captured & applied to stage!");
+          if (state.editingAvatarId) {
+            await applyUploadedPhotoToActiveAvatar(null, snapUrl);
+            showToast("Webcam photo captured & applied to stage!");
+          } else {
+            showToast("Webcam photo captured! Continue to Step 2 & Step 3 to save your custom avatar.");
+          }
         }
       });
     }
-
-    // Voice source tabs
-    const tabRecVoice = document.getElementById("tab-btn-record-voice");
-    const tabPreVoice = document.getElementById("tab-btn-prebuilt-voice");
-    const paneRecVoice = document.getElementById("voice-pane-record");
-    const panePreVoice = document.getElementById("voice-pane-prebuilt");
 
     if (tabRecVoice && tabPreVoice) {
       tabRecVoice.addEventListener("click", () => {
@@ -1732,10 +1940,14 @@
 
         btnRecStart.disabled = false;
         btnRecStop.disabled = true;
-        showToast("Custom voice recorded! Saving to your avatar...");
-        const updated = await applyUploadedVoiceToActiveAvatar(null, wavDataUrl);
-        if (updated) {
-          showToast("Custom voice recorded & saved to '" + updated.name + "'!");
+        if (state.editingAvatarId) {
+          showToast("Custom voice recorded! Saving to your avatar...");
+          const updated = await applyUploadedVoiceToActiveAvatar(null, wavDataUrl);
+          if (updated) {
+            showToast("Custom voice recorded & saved to '" + updated.name + "'!");
+          }
+        } else {
+          showToast("Custom voice recorded! Proceed to Step 3 to name & save your custom avatar.");
         }
       });
     }
@@ -1754,39 +1966,60 @@
           if (audioPlayer) audioPlayer.src = ev.target.result;
         };
         reader.readAsDataURL(file);
-        showToast("Uploading & saving custom voice: " + file.name + "...");
-        const updated = await applyUploadedVoiceToActiveAvatar(file, "");
-        if (updated) {
-          if (updated.custom_voice_data_url) {
-            state.builderVoiceDataUrl = updated.custom_voice_data_url;
-            if (audioPlayer) audioPlayer.src = updated.custom_voice_data_url;
+        if (state.editingAvatarId) {
+          showToast("Uploading & saving custom voice: " + file.name + "...");
+          const updated = await applyUploadedVoiceToActiveAvatar(file, "");
+          if (updated) {
+            if (updated.custom_voice_data_url) {
+              state.builderVoiceDataUrl = updated.custom_voice_data_url;
+              if (audioPlayer) audioPlayer.src = updated.custom_voice_data_url;
+            }
+            showToast("Custom voice saved to '" + updated.name + "'!");
           }
-          showToast("Custom voice saved to '" + updated.name + "'!");
+        } else {
+          showToast("Voice file '" + file.name + "' loaded! Proceed to Step 3 to save your custom avatar.");
         }
       });
     }
 
-    // Quick 1-Click Save Voice Change in Step 2 (for editing existing or active avatar)
+    // Quick 1-Click Save Voice Change in Step 2 (for editing existing avatar)
     const btnApplyVoiceStep2 = document.getElementById("btn-apply-voice-step2");
     if (btnApplyVoiceStep2) {
       btnApplyVoiceStep2.addEventListener("click", async () => {
-        const targetId = state.editingAvatarId || (state.activeAvatar && state.activeAvatar.id);
-        if (!targetId) {
-          showToast("Select a saved avatar first.");
+        if (!state.editingAvatarId) {
+          switchWizardStep(3);
+          showToast("Voice ready! Enter a name below and click Save Custom Avatar.");
           return;
         }
+        const targetId = state.editingAvatarId;
+        const targetAv = state.avatars.find((a) => a.id === targetId) || state.activeAvatar;
+        const isLocked = isPrebuiltLockedAvatar(targetAv);
         const fd = new FormData();
-        fd.append("voice_mode", state.builderVoiceDataUrl || state.uploadedVoiceFile ? "custom_voice" : state.builderVoiceMode);
+        fd.append(
+          "voice_mode",
+          isLocked
+            ? "prebuilt"
+            : state.builderVoiceDataUrl || state.uploadedVoiceFile
+            ? "custom_voice"
+            : state.builderVoiceMode
+        );
         fd.append("prebuilt_voice", state.builderPrebuiltVoice);
-        if (state.uploadedVoiceFile) {
-          fd.append("voice_file", state.uploadedVoiceFile, state.uploadedVoiceFile.name || "custom_voice.wav");
-        } else if (state.builderVoiceDataUrl && state.builderVoiceDataUrl.indexOf(",") !== -1) {
-          fd.append("voice_file", dataUrlToBlob(state.builderVoiceDataUrl), "custom_voice.wav");
+        if (state.builderPresetId) {
+          fd.append("preset_photo_id", state.builderPresetId);
+          fd.append("avatar_mode", state.builderAvatarMode);
+          fd.append("builtin_avatar_name", state.builderBuiltinName);
         }
-        if (state.uploadedPhotoFile) {
-          fd.append("photo_file", state.uploadedPhotoFile, state.uploadedPhotoFile.name || "custom_photo.jpg");
-        } else if (state.builderPhotoDataUrl && state.builderPhotoDataUrl.indexOf(",") !== -1) {
-          fd.append("photo_file", dataUrlToBlob(state.builderPhotoDataUrl), "custom_photo.jpg");
+        if (!isLocked) {
+          if (state.uploadedVoiceFile) {
+            fd.append("voice_file", state.uploadedVoiceFile, state.uploadedVoiceFile.name || "custom_voice.wav");
+          } else if (state.builderVoiceDataUrl && state.builderVoiceDataUrl.indexOf(",") !== -1) {
+            fd.append("voice_file", dataUrlToBlob(state.builderVoiceDataUrl), "custom_voice.wav");
+          }
+          if (state.uploadedPhotoFile) {
+            fd.append("photo_file", state.uploadedPhotoFile, state.uploadedPhotoFile.name || "custom_photo.jpg");
+          } else if (state.builderPhotoDataUrl && state.builderPhotoDataUrl.indexOf(",") !== -1) {
+            fd.append("photo_file", dataUrlToBlob(state.builderPhotoDataUrl), "custom_photo.jpg");
+          }
         }
 
         btnApplyVoiceStep2.disabled = true;
@@ -1818,7 +2051,7 @@
       });
     }
 
-    // Shared function to save new or edited avatar from Step 3 OR the Modal Header Save button
+    // Shared function to save new or edited avatar from Step 3 OR Step 1 preset apply
     const btnSaveAvatar = document.getElementById("btn-save-new-avatar");
     async function saveBuilderModalAvatar() {
       const nameInput = document.getElementById("builder-name");
@@ -1829,15 +2062,18 @@
       const editingAv = isEditing
         ? state.avatars.find((a) => a.id === state.editingAvatarId) || state.activeAvatar
         : null;
+      const isLocked = isEditing && isPrebuiltLockedAvatar(editingAv);
 
-      const nameVal =
-        (nameInput && nameInput.value.trim()) ||
-        (editingAv && editingAv.name) ||
-        "My Custom Avatar";
-      const tagVal =
-        (tagInput && tagInput.value.trim()) ||
-        (editingAv && editingAv.role_tagline) ||
-        "Custom Photo & Voice Persona";
+      const nameVal = isLocked
+        ? editingAv.name
+        : (nameInput && nameInput.value.trim()) ||
+          (editingAv && editingAv.name) ||
+          "My Custom Avatar";
+      const tagVal = isLocked
+        ? editingAv.role_tagline
+        : (tagInput && tagInput.value.trim()) ||
+          (editingAv && editingAv.role_tagline) ||
+          "Custom Photo & Voice Persona";
       const sysVal =
         (sysInput && sysInput.value.trim()) ||
         (editingAv && editingAv.system_instruction) ||
@@ -1851,20 +2087,28 @@
       if (state.builderPresetId) {
         fd.append("preset_photo_id", state.builderPresetId);
       }
-      if (state.uploadedPhotoFile) {
-        fd.append("photo_file", state.uploadedPhotoFile, state.uploadedPhotoFile.name || "custom_photo.jpg");
-      } else if (state.builderPhotoDataUrl && state.builderPhotoDataUrl.indexOf(",") !== -1) {
-        fd.append("photo_file", dataUrlToBlob(state.builderPhotoDataUrl), "custom_photo.jpg");
+      if (!isLocked) {
+        if (state.uploadedPhotoFile) {
+          fd.append("photo_file", state.uploadedPhotoFile, state.uploadedPhotoFile.name || "custom_photo.jpg");
+        } else if (state.builderPhotoDataUrl && state.builderPhotoDataUrl.indexOf(",") !== -1) {
+          fd.append("photo_file", dataUrlToBlob(state.builderPhotoDataUrl), "custom_photo.jpg");
+        }
       }
       fd.append(
         "voice_mode",
-        state.builderVoiceDataUrl || state.uploadedVoiceFile ? "custom_voice" : state.builderVoiceMode
+        isLocked
+          ? "prebuilt"
+          : state.builderVoiceDataUrl || state.uploadedVoiceFile
+          ? "custom_voice"
+          : state.builderVoiceMode
       );
       fd.append("prebuilt_voice", state.builderPrebuiltVoice);
-      if (state.uploadedVoiceFile) {
-        fd.append("voice_file", state.uploadedVoiceFile, state.uploadedVoiceFile.name || "custom_voice.wav");
-      } else if (state.builderVoiceDataUrl && state.builderVoiceDataUrl.indexOf(",") !== -1) {
-        fd.append("voice_file", dataUrlToBlob(state.builderVoiceDataUrl), "custom_voice.wav");
+      if (!isLocked) {
+        if (state.uploadedVoiceFile) {
+          fd.append("voice_file", state.uploadedVoiceFile, state.uploadedVoiceFile.name || "custom_voice.wav");
+        } else if (state.builderVoiceDataUrl && state.builderVoiceDataUrl.indexOf(",") !== -1) {
+          fd.append("voice_file", dataUrlToBlob(state.builderVoiceDataUrl), "custom_voice.wav");
+        }
       }
       fd.append("system_instruction", sysVal);
 
@@ -1893,8 +2137,8 @@
         closeModal();
         showToast(
           isEditing
-            ? "\u2713 Saved '" + saved.name + "' (Photo & Voice persisted to Cloud Storage)!"
-            : "\u2713 Saved '" + saved.name + "' to your Avatar Library!"
+            ? "\u2713 Saved '" + saved.name + "'!"
+            : "\u2713 Created custom avatar '" + saved.name + "' (please delete after use)!"
         );
         if (state.isLive && isEditing) {
           startLiveSession();
@@ -1906,7 +2150,7 @@
           btnSaveAvatar.disabled = false;
           btnSaveAvatar.textContent = isEditing
             ? "\u2713 Save Changes to '" + nameVal + "'"
-            : "Save Reusable Avatar to Studio Library";
+            : "Save Custom Avatar to Studio Library";
         }
       }
     }
@@ -1946,13 +2190,20 @@
 
         tile.addEventListener("click", () => {
           state.builderPresetId = p.id;
+          state.uploadedPhotoFile = null;
+          state.builderPhotoDataUrl = "";
           if (p.type === "builtin") {
             state.builderAvatarMode = "builtin";
             state.builderBuiltinName = p.avatar_name;
           } else {
             state.builderAvatarMode = "custom_photo";
           }
-          loadUrlIntoPortraitCanvas(p.preview_url, "Selected: " + p.name);
+          const previewImgEl = document.getElementById("builder-photo-preview-img");
+          if (previewImgEl) {
+            previewImgEl.src = p.preview_url;
+            previewImgEl.style.display = "block";
+          }
+          loadUrlIntoPortraitCanvas(p.preview_url, "Selected Prebuilt Avatar: " + p.name, false);
           populateBuilderPresetsAndVoices();
         });
 
